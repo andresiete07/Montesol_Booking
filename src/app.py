@@ -10,14 +10,22 @@ for i in range(16):
         hours_row.append("0")
     hours.append(hours_row)
     
-hours[5][6] = "Andreu Folch"
+days = ['Lunes', 'Martes', 'Miercoles', 'Jueves', 'Viernes', 'Sabado', 'Domingo']   
+
 @app.route('/')
 def home():
-    return '<h1>¡Bienvenidos Montesoleros!</h1>\n esta es la web de reserva de la pista de tenis'
+    return render_template('home.html')
 
 @app.route('/calendar')
 def calendar():
     return render_template('calendar.html', hours=hours)
+
+@app.route('/calendar/<user_name> <user_last_name>')
+def calendar_users(user_name, user_last_name):
+    return render_template('calendar_users.html', hours=hours, name= user_name, last_name= user_last_name)
+
+
+
 # Input thorugh URL example
 @app.route('/<name>')
 def user(name):
@@ -34,11 +42,30 @@ def book():
     # Get the day and time from the form
     day = request.form['day']
     time = request.form['time']
+    user_name = request.form['name']
+    user_last_name = request.form['last_name']
+    print('yeeeeeeeeee', user_name, user_last_name)
     
     if hours[int(time)][int(day)] == "0":
-        hours[int(time)][int(day)] = "Andreu Folch"
-        return 'You have booked the tennis court for the day ' + day + ' at ' + time
-    
+        hours[int(time)][int(day)] = user_name + ' ' + user_last_name
+        
+        #return 'Has reservado la pista de tenis de Montesol para el  ' + days[int(day)] + ' de ' + str(int(time)+ 7) + ' a ' + str(int(time) + 8) 
+
+    return redirect(url_for('calendar_users', user_name = user_name, user_last_name = user_last_name))
+
+@app.route('/login', methods=['POST', 'GET'])
+def login():
+    if request.method == 'POST':
+        
+        user_name = request.form['users_name'] 
+        user_last_name = request.form['surname']
+        
+        print(user_name)
+        print(user_last_name)
+        
+        return redirect(url_for('calendar_users', user_name = user_name, user_last_name = user_last_name))
+    else:
+        return render_template('login.html')
 
 
 if __name__ == '__main__':

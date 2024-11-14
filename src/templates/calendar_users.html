@@ -23,6 +23,8 @@
     <header>
         <h1>Calendario de Reservas Semanal</h1>
 
+    <p>Hola {{name}}, selecciona la hora de la semana que quieras reservar. Recuerda que cada persona puede reservar un máximo de 5 horas semanales.</p>
+
     </header>
     <table>
         <thead>
@@ -50,7 +52,15 @@
                             <td style="background-color: rgb(255, 73, 73);"> {{hour}} <br>
                             <button disabled>Pista reservada</button></td>
                         {% else %}
-                            <td style="background-color: green;"> Pista libre </td> 
+                            <td style="background-color: green;"> 
+                            <!-- The button triggers a POST request to the /book route -->
+                            <form action="{{ url_for('book') }}" method="POST">
+                                <input type="hidden" name="day" value="{{ j }}">
+                                <input type="hidden" name="time" value="{{ i }}">
+                                <input type="hidden" name="name" value="{{ name }}">
+                                <input type="hidden" name="last_name" value="{{ last_name }}">
+                                <button type="submit">Reservar</button>
+                            </form></td>
                         {% endif %}
                     {% endfor %}
                 </tr>
