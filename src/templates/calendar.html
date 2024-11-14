@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calendario de Reservas Semanal</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid #000;
+            text-align: center;
+            padding: 16px;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Calendario de Reservas Semanal</h1>
+    </header>
+    <table>
+        <thead>
+            <tr>
+                <th>Hora</th>
+                <th>Lunes</th>
+                <th>Martes</th>
+                <th>Miércoles</th>
+                <th>Jueves</th>
+                <th>Viernes</th>
+                <th>Sábado</th>
+                <th>Domingo</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for i in range(hours|length) %}
+                {% set hour_row = hours[i] %}
+                {% set hour_initial = 7 + i %}
+                {% set hour_final = hour_initial + 1 %}
+                <tr>
+                    <td>{{hour_initial}}:00 - {{hour_final}}:00</td>
+                    {% for j in range(hour_row|length) %}
+                        {% set hour = hour_row[j] %}
+                        {% if hour != "0" %}
+                            <td style="background-color: rgb(255, 73, 73);"> {{hour}} <br>
+                            <button disabled>Pista reservada</button></td>
+                        {% else %}
+                            <td style="background-color: green;"> 
+                            <!-- The button triggers a POST request to the /book route -->
+                            <form action="{{ url_for('book') }}" method="POST">
+                                <input type="hidden" name="day" value="{{ i }}">
+                                <input type="hidden" name="time" value="{{ j }}">
+                                <button type="submit">Reservar</button>
+                            </form></td>
+                        {% endif %}
+                    {% endfor %}
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>
