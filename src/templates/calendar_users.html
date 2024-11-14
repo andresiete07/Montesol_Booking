@@ -17,14 +17,23 @@
         th {
             background-color: #f2f2f2;
         }
+        .logout-button {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+        }
     </style>
 </head>
 <body>
     <header>
         <h1>Calendario de Reservas Semanal</h1>
-
-    <p>Hola {{name}}, selecciona la hora de la semana que quieras reservar. Recuerda que cada persona puede reservar un máximo de 5 horas semanales.</p>
-
+        <p>Hola {{name}}, selecciona la hora de la semana que quieras reservar haciendo click sobre el botón "Reservar".</p>
+        <p> Recuerda que cada persona puede reservar un máximo de {{max_bookings}} horas semanales.</p>
+        <p> Has realizado un total de {{bookings_count}} reservas ({{max_bookings - bookings_count}} reservas restantes). </p>
+        <p>Si deseas cancelar una reserva, haz clic en el botón "Cancelar Reserva".</p>
+        <form action="{{ url_for('logout') }}" method="POST" class="logout-button">
+            <button type="submit">Cerrar Sesión</button>
+        </form>
     </header>
     <table>
         <thead>
@@ -48,17 +57,24 @@
                     <td>{{hour_initial}}:00 - {{hour_final}}:00</td>
                     {% for j in range(hour_row|length) %}
                         {% set hour = hour_row[j] %}
-                        {% if hour != "0" %}
+                        {% if hour != "0" and (name + ' ' + last_name) != hour %}
                             <td style="background-color: rgb(255, 73, 73);"> {{hour}} <br>
                             <button disabled>Pista reservada</button></td>
+                        {% elif hour != "0" and (name + " " + last_name) == hour %}
+                            <td style="background-color: rgb(255, 73, 73);"> {{hour}} <br>
+                            <form action=" {{ url_for('cancel') }} " method="POST">
+                                <input type="hidden" name="day" value="{{ j }}">
+                                <input type="hidden" name="time" value="{{ i }}">
+                                <button type="submit">Cancelar Reserva</button>
+                            </form></td>
+                        {% elif hour == "0" and bookings_count >= max_bookings %}
+                            <td style="background-color: green;"> </td>
                         {% else %}
-                            <td style="background-color: green;"> 
+                            <td style="background-color: green;">   
                             <!-- The button triggers a POST request to the /book route -->
                             <form action="{{ url_for('book') }}" method="POST">
                                 <input type="hidden" name="day" value="{{ j }}">
                                 <input type="hidden" name="time" value="{{ i }}">
-                                <input type="hidden" name="name" value="{{ name }}">
-                                <input type="hidden" name="last_name" value="{{ last_name }}">
                                 <button type="submit">Reservar</button>
                             </form></td>
                         {% endif %}
